@@ -1,0 +1,750 @@
+<title>Special Delivery Letters</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Yeseva+One&display=swap">
+<style>
+/* Layout: one letter-width column. An airmail postcard holds today's question; each reply is a sealed
+   envelope until both are posted, then both letters open side by side. Tabs switch to the archive and the deck. */
+:root{
+  --bg:#F8EDEC; --card:#FFFCFA; --ink:#3E2433; --ink-soft:#7D5868; --line:#EBD8DD;
+  --rose:#C9416D; --rose-deep:#A8305A; --blue:#3557A6; --kraft:#E8D2AF; --kraft-2:#D6BA8E;
+  --seal:#B32E52; --on-accent:#FFFCFA; --tint:#FBE3E9;
+  --f-display:"Yeseva One",Didot,"Bodoni 72",Georgia,serif;
+  --f-label:"Courier Prime","Courier New",ui-monospace,monospace;
+  --f-body:"Gaegu","Bradley Hand","Segoe Print",cursive;
+  --f-hand:"Nanum Pen Script","Gaegu","Bradley Hand",cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C1420; --card:#281D2C; --ink:#F4E7ED; --ink-soft:#C3A9B6; --line:#3D2E42;
+  --rose:#F07CA0; --rose-deep:#F59AB6; --blue:#8FA9F2; --kraft:#5E4A33; --kraft-2:#4A3A27;
+  --seal:#E0567C; --on-accent:#1C1420; --tint:#3A2533; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C1420; --card:#281D2C; --ink:#F4E7ED; --ink-soft:#C3A9B6; --line:#3D2E42;
+  --rose:#F07CA0; --rose-deep:#F59AB6; --blue:#8FA9F2; --kraft:#5E4A33; --kraft-2:#4A3A27;
+  --seal:#E0567C; --on-accent:#1C1420; --tint:#3A2533; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 19px/1.35 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.airmail{height:8px;background:repeating-linear-gradient(-45deg,var(--rose) 0 14px,var(--card) 14px 22px,var(--blue) 22px 36px,var(--card) 36px 44px)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 48px;display:flex;flex-direction:column;gap:20px}
+
+/* header */
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+.brand{min-width:0}
+.eyebrow{margin:0 0 4px;font:700 12px/1.2 var(--f-label);letter-spacing:.2em;text-transform:uppercase;color:var(--rose)}
+h1{margin:0;font:400 clamp(30px,7vw,42px)/1 var(--f-display);text-wrap:balance}
+.pair{display:flex;align-items:center;gap:10px}
+.person{display:flex;align-items:center;gap:8px}
+.avatar{position:relative;width:36px;height:36px;flex:none}
+.avatar img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--card);display:block}
+.avatar i{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg);background:var(--ink-soft);opacity:.5}
+.avatar i.on{background:#3FA36B;opacity:1}
+.who{display:flex;flex-direction:column;line-height:1.05}
+.who b{font-weight:700;font-size:18px}
+.who small{font:400 11px/1.3 var(--f-label);letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase}
+.amp{font:400 22px/1 var(--f-display);color:var(--rose)}
+
+.stats{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;font:400 12px/1.3 var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.stats b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1.5px dashed var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 12px 9px;font:700 13px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);border-bottom:3px solid transparent;margin-bottom:-1.5px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--rose)}
+
+/* postcard */
+.card{position:relative;background:var(--card);border:9px solid transparent;
+  border-image:repeating-linear-gradient(-45deg,var(--rose) 0 12px,var(--card) 12px 18px,var(--blue) 18px 30px,var(--card) 30px 36px) 9;
+  padding:22px clamp(16px,4vw,30px) 24px;box-shadow:0 18px 40px -26px rgba(62,36,51,.45)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.stamp{flex:none;background:var(--rose);color:var(--on-accent);padding:9px 10px 8px;outline:2px dashed var(--on-accent);outline-offset:-5px;
+  font:700 11px/1.15 var(--f-label);letter-spacing:.12em;text-transform:uppercase;max-width:140px;text-align:center;transform:rotate(2deg)}
+.postmark{flex:none;width:86px;height:86px;border:2px solid var(--ink-soft);border-radius:50%;display:grid;place-content:center;text-align:center;
+  font:700 11px/1.25 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);transform:rotate(-10deg);opacity:.85}
+.postmark b{display:block;font-size:17px;letter-spacing:.02em}
+.q{margin:6px 0 8px;font:400 clamp(24px,5.2vw,31px)/1.2 var(--f-display);text-wrap:balance}
+.hint{margin:0 0 18px;color:var(--ink-soft);font-size:17px}
+
+.slots{display:grid;gap:16px}
+.label{margin:0 0 6px;font:700 12px/1.2 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+textarea{width:100%;min-height:150px;resize:vertical;border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;
+  background:repeating-linear-gradient(var(--card) 0 33px,var(--line) 33px 34px);background-attachment:local;
+  font:400 26px/34px var(--f-hand);color:var(--ink)}
+textarea:focus{border-color:var(--rose);outline:none}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.btn{border:0;border-radius:3px;background:var(--rose);color:var(--on-accent);padding:12px 18px 11px;font:700 13px/1 var(--f-label);letter-spacing:.14em;text-transform:uppercase;box-shadow:0 3px 0 var(--rose-deep)}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--rose-deep)}
+.btn[disabled]{opacity:.5;cursor:default}
+.link{border:0;background:none;padding:6px 0;font:700 12px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.muted{color:var(--ink-soft);font-size:16px}
+
+/* envelopes */
+.env{position:relative;height:118px;border-radius:3px;background:linear-gradient(180deg,var(--kraft),var(--kraft-2));overflow:hidden}
+.env::before{content:"";position:absolute;inset:0 0 auto;height:72%;background:var(--kraft-2);clip-path:polygon(0 0,100% 0,50% 100%);filter:brightness(.97)}
+.env::after{content:"";position:absolute;inset:auto 0 0;height:60%;background:var(--kraft);clip-path:polygon(0 100%,50% 0,100% 100%)}
+.seal{position:absolute;left:50%;top:58%;z-index:1;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--seal);display:grid;place-items:center;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--seal) 70%,transparent),0 4px 8px rgba(0,0,0,.25)}
+.seal svg{width:20px;height:20px;fill:var(--on-accent)}
+.env.empty{background:none;border:2px dashed var(--line)}
+.env.empty::before,.env.empty::after{display:none}
+.env.empty .seal{background:var(--line);box-shadow:none}
+.env.empty .seal svg{fill:var(--ink-soft)}
+.env-note{margin:8px 0 0;font-size:18px}
+.writing{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
+.writing span{width:5px;height:5px;border-radius:50%;background:var(--rose);animation:blink 1.2s infinite}
+.writing span:nth-child(2){animation-delay:.2s}.writing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* letters */
+.letters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px}
+.letter{min-width:0;background:var(--card);border:1.5px solid var(--line);border-radius:3px;padding:12px 14px 12px;
+  background-image:repeating-linear-gradient(transparent 0 31px,var(--line) 31px 32px);background-position:0 38px}
+.letter.opening{animation:open .6s ease-out both}
+@keyframes open{from{opacity:0;transform:translateY(10px) rotate(-1deg)}to{opacity:1;transform:none}}
+.letter .from{margin:0 0 4px;font:700 11px/1.2 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--rose)}
+.letter .text{margin:0;font:400 25px/32px var(--f-hand);white-space:pre-wrap;overflow-wrap:anywhere}
+.mine-sealed{border-style:dashed}
+.reacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{border:1.5px solid var(--line);border-radius:999px;background:var(--card);padding:5px 10px 4px;font:700 11px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.chip[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:var(--on-accent)}
+.got{display:inline-block;margin-top:10px;padding:5px 10px 4px;border-radius:999px;background:var(--tint);font:700 11px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--rose-deep)}
+.next{margin-top:18px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+
+/* welcome */
+.steps{margin:4px 0 20px;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:baseline;counter-increment:s}
+.steps li::before{content:counter(s);font:400 22px/1 var(--f-display);color:var(--rose)}
+
+/* archive */
+.archive{display:grid;gap:16px}
+.entry{background:var(--card);border-left:5px solid var(--rose);padding:14px 16px 16px;border-radius:2px}
+.entry:nth-child(even){border-left-color:var(--blue)}
+.entry-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 6px;font:700 11px/1.3 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.entry h3{margin:0 0 12px;font:400 20px/1.25 var(--f-display);text-wrap:balance}
+.empty-state{padding:26px 20px;text-align:center;border:2px dashed var(--line);border-radius:4px;color:var(--ink-soft)}
+
+/* deck */
+.deck{display:grid;gap:10px}
+.cat{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:4px;padding:12px 14px}
+.cat[aria-pressed="true"]{border-color:var(--rose);box-shadow:inset 4px 0 0 var(--rose)}
+.box{width:22px;height:22px;border:2px solid var(--ink-soft);border-radius:3px;display:grid;place-items:center}
+.cat[aria-pressed="true"] .box{background:var(--rose);border-color:var(--rose)}
+.box svg{width:14px;height:14px;fill:none;stroke:var(--on-accent);stroke-width:3;opacity:0}
+.cat[aria-pressed="true"] .box svg{opacity:1}
+.cat b{display:block;font-size:20px}
+.cat small{font:400 12px/1.3 var(--f-label);letter-spacing:.06em;color:var(--ink-soft)}
+.add{display:flex;gap:8px;flex-wrap:wrap}
+.add input{flex:1 1 220px;min-width:0;border:1.5px solid var(--line);border-radius:4px;background:var(--card);padding:10px 12px;font-size:19px}
+.own{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.own li{display:flex;gap:10px;align-items:baseline;justify-content:space-between;padding:8px 0;border-bottom:1.5px dashed var(--line)}
+.own span{min-width:0;overflow-wrap:anywhere}
+h2{margin:6px 0 2px;font:400 22px/1.2 var(--f-display)}
+
+.notice{padding:14px 16px;border-radius:4px;background:var(--tint);color:var(--ink);font-size:18px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:4px;font:700 13px/1.3 var(--f-label);z-index:20}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="airmail" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <div class="brand">
+      <p class="eyebrow">Par avion · questions for two</p>
+      <h1>Special Delivery</h1>
+    </div>
+    <div class="pair" id="pair" aria-label="Players"></div>
+  </header>
+
+  <p class="stats" id="stats"><span><b>0</b> letters opened</span><span><b>0</b> new things learned</span><span><b>0</b> called it</span></p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-play" aria-selected="true" data-tab="play">Today’s letter</button>
+    <button class="tab" role="tab" id="tab-letters" aria-selected="false" data-tab="letters">Our letters</button>
+    <button class="tab" role="tab" id="tab-deck" aria-selected="false" data-tab="deck">The deck</button>
+  </div>
+
+  <div id="banner" class="notice" hidden></div>
+
+  <main>
+    <section id="view-play" role="tabpanel" aria-labelledby="tab-play">
+      <article class="card">
+        <div class="card-top">
+          <span class="stamp" id="stamp">Airmail</span>
+          <span class="postmark" id="postmark"><span>Letter</span><b>No. 1</b><span id="pm-date"></span></span>
+        </div>
+        <div id="card-body">
+          <p class="q">Opening the mailbox…</p>
+        </div>
+        <div id="compose" hidden>
+          <p class="label" id="compose-label">Your reply</p>
+          <textarea id="reply" placeholder="Dear…" aria-labelledby="compose-label"></textarea>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="send">Seal &amp; send</button>
+            <button class="link" id="cancel-edit" hidden>Keep my sent reply</button>
+            <span class="muted" id="compose-note">Your partner can’t read it until they send theirs.</span>
+          </div>
+        </div>
+        <div id="card-foot"></div>
+      </article>
+    </section>
+
+    <section id="view-letters" role="tabpanel" aria-labelledby="tab-letters" hidden>
+      <div class="archive" id="archive"></div>
+    </section>
+
+    <section id="view-deck" role="tabpanel" aria-labelledby="tab-deck" hidden>
+      <div class="deck">
+        <p class="muted" style="margin:0">Choose which piles the next question comes from. You both share one deck, and a question never repeats until its pile runs out.</p>
+        <div class="deck" id="cats"></div>
+        <h2>Your own questions</h2>
+        <form class="add" id="add-form">
+          <input id="own-q" maxlength="240" placeholder="Something you’ve always wanted to ask…" autocomplete="off">
+          <button class="btn" type="submit">Add to deck</button>
+        </form>
+        <ul class="own" id="own-list"></ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const CATS = [
+ {key:"us", name:"Things about us", qs:[
+  "What’s a small thing that means a lot to you in our relationship?",
+  "What’s a memory of us that will always make you laugh?",
+  "What’s something we do that feels very “us”?",
+  "What’s something you used to love doing that you haven’t done in a while?",
+  "What’s something you do differently from most people but swear your way is better?",
+  "Describe what you want our lives to look like in 1 year (and what’s one thing we can do right now to put us on that path?).",
+  "What’s the most “me” thing I do?",
+  "What’s one moment in our relationship you think about more than I probably realize?",
+  "What’s a tiny tradition we have that you secretly love?",
+  "What’s something about our relationship that makes you feel proud?",
+  "What’s one thing our relationship has taught you?",
+  "What’s one unique thing about our relationship that a lot of other couples don’t have?",
+  "What’s something about our relationship you hope never goes away?",
+  "What do you wish we did more of together?",
+  "What’s one thing you’d change about our relationship?",
+  "What’s something you think we do really well as a couple?",
+  "What’s your favorite phase of our relationship so far?",
+  "What’s something that used to be hard for us that feels easy now?",
+  "What’s something you’ve started doing differently because of me?",
+  "What’s one random thing that always makes you think of me?",
+  "What’s something you think we’ll still be doing together when we’re old?",
+  "What’s one little way you like to show me love that I might not notice?",
+  "What’s something we’ve figured out together that you think other couples struggle with?",
+  "What’s one small way we’ve influenced each other’s habits?",
+  "If we made a time capsule of our relationship right now, what would you put in it?",
+  "What’s your favorite version of us (chill mode, travel mode, etc.)?",
+  "What’s one thing that felt like a risk at the time but ended up strengthening us?",
+  "What’s one inside joke we haven’t used in a while but used to laugh at all the time?",
+  "What’s something about our connection that you didn’t expect going into this?"]},
+ {key:"know", name:"Always getting to know each other", qs:[
+  "What’s something most people misunderstand about you?",
+  "What’s one skill you’ve always wanted to learn but haven’t yet?",
+  "What is my love language?",
+  "What’s one value you live by that you think more people should adopt?",
+  "What’s something you’ve done that took a lot of courage, big or small?",
+  "What’s a quality you admire in someone else that you’re working on building?",
+  "What’s your ideal way to spend a completely free weekend?",
+  "What’s something in your life that didn’t work out that you’re now happy didn’t?",
+  "What’s a compliment you’ve gotten that stuck with you for years?",
+  "What’s something you do differently now in relationships than you did in the past?",
+  "What’s a conversation or moment from childhood you still think about?",
+  "Describe yourself in three words.",
+  "In what environment or situation(s) do you feel the most confident?",
+  "What kind of environments make you feel the most energized?",
+  "What’s your love language with friends, and is it different than in relationships?",
+  "What’s one part of your identity that you feel most connected to right now?",
+  "What’s one belief or opinion you’ve changed your mind about recently?",
+  "What’s the last new thing you learned about me?",
+  "What’s the most surprising thing you’ve learned about me?",
+  "What celebrity could you picture me being friends with?",
+  "What’s one movie or TV show I could watch again and again?",
+  "What’s one thing about you that’s changed in the past year?",
+  "What’s something you’ve been procrastinating on lately?",
+  "What’s one thing you think I’m procrastinating on?",
+  "What do you think I spend most of my day thinking about?",
+  "Who do you talk to most about our relationship?",
+  "What’s one topic I could talk for hours about?",
+  "Is there something you’ve always wanted to do that you’re holding back from?",
+  "What’s something you think I get wrong about you?",
+  "Who were your idols growing up? How about your role models now?",
+  "What were your favorite shows, movies, books, or songs growing up?",
+  "What is the first memory you can remember?",
+  "What’s one story your family or friends love to tell about you from growing up?",
+  "What’s a small challenge you overcame that really shaped you?",
+  "What’s one part of your routine that makes you feel most like yourself?"]},
+ {key:"fun", name:"Light, funny, random", qs:[
+  "If I walked into a room with every person I’ve ever met, who would I look for first? (You can’t say you.)",
+  "What food am I most likely to sneak out of the fridge?",
+  "What’s the last thing that made you laugh uncontrollably?",
+  "What song would you love to hear me perform in karaoke?",
+  "Describe me using three emojis.",
+  "If our relationship had a theme song, what would it be?",
+  "If we had to pick a couple’s costume, what would it be?",
+  "What’s the most random thing you’ve ever Googled late at night?",
+  "If we had to compete on a game show, which one are we winning?",
+  "What’s your most irrational fear?",
+  "What’s your weirdest talent or party trick?",
+  "What’s a commercial jingle or quote you randomly think of all the time?",
+  "What’s your go-to overly dramatic reaction?",
+  "What’s the most ridiculous thing we’ve ever argued about?",
+  "What’s something you’ve done while alone that you would never do in public?",
+  "If I turned into an animal for a day, what animal would it be?",
+  "If you were on a reality TV show, what would the descriptor be under your name?",
+  "What’s a food we completely disagree on?",
+  "What’s a made-up award I deserve? (The more niche and ridiculous, the better.)",
+  "What’s a completely random moment with me that lives rent-free in your head?",
+  "What’s the weirdest thing you’ve caught me doing when I thought no one was watching?",
+  "If you saw me out and didn’t know me, what pickup line would you use or how would you approach me?",
+  "What’s the most unnecessary thing you’re oddly passionate about?",
+  "If I were to become famous, what would it be for?",
+  "If you had to describe our relationship as a food pairing, what would it be?",
+  "What on-screen couple would you compare our relationship to?",
+  "If you had to pitch me for a reality show, which would it be and how would you pitch me?",
+  "What’s something about me that would absolutely give me away in a game of “Guess Who?”",
+  "Imitate how I react when I’m excited about something. (Write it down, then do it out loud.)",
+  "What’s a hill you’ll die on that I still don’t agree with?",
+  "If we could live in any movie or TV show universe, what would you choose?",
+  "If your childhood self met you now, what would they be most surprised by?",
+  "What song reminds you of me and why?",
+  "What scent reminds you of me and why?"]},
+ {key:"back", name:"Looking back", qs:[
+  "What’s one way I’ve grown or changed since we started dating?",
+  "What’s one thing you never did before dating me but do regularly now?",
+  "What’s something I said once that you still think about?",
+  "What’s one assumption people had or have about us that isn’t true?",
+  "What’s something from our early days that you didn’t appreciate enough or soak in at the time?",
+  "What’s the funniest (or hottest) memory you have from our relationship?",
+  "What was your first impression of our dynamic as a couple?",
+  "What’s a detail about one of our first dates that you still remember clearly?",
+  "What’s something from another relationship that you’ve unlearned with me?",
+  "What’s something small I did early in our relationship that left a lasting impression?",
+  "What’s your favorite photo of us, and what do you remember about that day?",
+  "What advice would you give to your past self right before we met?",
+  "What’s one date of ours that didn’t go as planned but turned out better because of it?",
+  "What’s something small from our first few months that felt like a big deal at the time?",
+  "What’s something that felt like a green flag early on, and totally held up?",
+  "If we get in a fight, who am I calling?",
+  "What one meal do I always order if it’s on the menu?",
+  "What’s one indicator that I’m annoyed or upset?",
+  "How did our first date differ from what you expected?",
+  "Describe your first impression of me.",
+  "What was your first “I think I like them” moment with me?",
+  "What’s something you wish we had recorded or taken a photo of?",
+  "What’s something in your or our life right now that you think you’ll be nostalgic for in 20 years?",
+  "What’s something we’ve done together that would make a great scene in a rom-com?",
+  "What is one of your favorite early memories of us?"]},
+ {key:"ahead", name:"Looking ahead", qs:[
+  "If you could look 15 years into our lives for just 30 seconds, what would you want to see or find out?",
+  "What’s one thing we can do to step out of our comfort zone this week?",
+  "What’s one new thing we can do this week?",
+  "What’s one thing you hope we’re both better at a year from now?",
+  "What’s a new ritual or habit we could start this month?",
+  "What’s a dream trip we haven’t taken yet but absolutely should?",
+  "What’s a goal you’re working toward that I could support more?",
+  "What’s something we could do together that would scare us (in a good way)?",
+  "What do you imagine will matter most to us in five years?",
+  "What’s a “someday” idea you’d actually love to start planning now?",
+  "What’s something we haven’t prioritized enough that we probably should?",
+  "What’s something you’re currently dreaming about for your own life?",
+  "If we wrote a bucket list, what’s going on the top?",
+  "What’s one small investment in our future that we could make this month?",
+  "What’s a place we’ve never been that you associate with “us” anyway?",
+  "What’s something we should say yes to more often?",
+  "Describe my dream home.",
+  "If we could live together in any other city, what would you choose?",
+  "If we had to switch lives for a day, what would you most and least look forward to?",
+  "If we were to have kids, what qualities do you hope they get from each of us?"]},
+ {key:"raw", name:"Us, unfiltered", qs:[
+  "If you close your eyes and think of me, what am I wearing?",
+  "Have you ever written anything in your notes app about me?",
+  "What do you think my favorite feature of yours is (physical and emotional)?",
+  "What’s one non-negotiable for you in our relationship?",
+  "What’s one thing I do that makes you feel loved or appreciated?",
+  "What’s your favorite date we’ve been on?",
+  "When you look at me in the morning, what’s the first thing you notice?",
+  "What’s a question you’ve wanted to ask me but haven’t?",
+  "What’s a topic we could probably host a joint TED Talk on at this point?",
+  "If someone described me in three words, what do you think they’d say?",
+  "What’s a phrase or saying of mine that’s part of your vocabulary now?",
+  "What’s something you’ve caught yourself doing that you picked up from me?",
+  "If you had to describe me using a meme or GIF, which would it be?",
+  "What’s something you hope never changes about me, even as we change?",
+  "What’s one thing you do that instantly turns me on?",
+  "What’s one weird hill you think I’d die on?",
+  "What’s one thing we completely disagree on, but have learned to live with?",
+  "What’s one thing you miss about the early days of our relationship?",
+  "What’s one thing that surprised you about my personality?",
+  "What’s an everyday habit of mine that makes you laugh?",
+  "What’s one thing you’d warn someone about before dating me?",
+  "What quality of mine do you wish you had?",
+  "What’s an everyday thing I do that you find attractive?",
+  "What’s something you’ve noticed about me that I don’t give myself enough credit for?"]},
+];
+const OWN = {key:"own", name:"Your own questions"};
+const REACTS = [{k:"love",label:"Love this"},{k:"knew",label:"Knew it"},{k:"ha",label:"Ha!"},{k:"new",label:"Didn’t know that"}];
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.4 5c2 0 3.4 1.1 4.1 2.3h3C14.2 6.1 15.6 5 17.6 5 21 5 23.1 8.4 21.6 11.8 19.5 16.4 12 21 12 21z"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+const S = {db:null,user:null,room:null,me:null,canWrite:true,ready:false,status:"loading",
+  round:null,roundLoaded:false,deck:null,rounds:new Map(),answers:new Map(),custom:new Map(),
+  peers:[],profiles:{},tab:"play",busy:false,editing:false,composeRid:null,seen:new Set(),writing:false};
+
+const $ = id => document.getElementById(id);
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})){
+    if (v==null || v===false) continue;
+    if (k==="class") el.className = v;
+    else if (k==="text") el.textContent = v;
+    else if (k==="html") el.innerHTML = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v===true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c!=null && c!==false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+const store = {
+  get(k){ try{ return localStorage.getItem(k) }catch{ return null } },
+  set(k,v){ try{ v==null ? localStorage.removeItem(k) : localStorage.setItem(k,v) }catch{} }
+};
+
+/* ---------- derived state ---------- */
+function allQuestions(){
+  const list = [];
+  CATS.forEach(c => c.qs.forEach((text,i) => list.push({qid:c.key+"-"+i, cat:c.key, text})));
+  for (const [id,c] of S.custom) list.push({qid:"own-"+id, cat:"own", text:c.text});
+  return list;
+}
+function catName(key){ return key==="own" ? OWN.name : (CATS.find(c=>c.key===key)?.name || "Airmail"); }
+function deckCats(){ const c = S.deck?.cats; return Array.isArray(c) && c.length ? c : [...CATS.map(c=>c.key),"own"]; }
+function answersFor(rid){ return [...S.answers.values()].filter(a => a.rid===rid); }
+function mineFor(rid){ return answersFor(rid).find(a => a.uid===S.me) || null; }
+function theirsFor(rid){ return answersFor(rid).filter(a => a.uid!==S.me).sort((a,b)=>(b.at||0)-(a.at||0))[0] || null; }
+function revealed(rid){ return new Set(answersFor(rid).map(a=>a.uid)).size >= 2; }
+function answerDocId(rid, uid){ return rid + "--" + String(uid).replace(/[^A-Za-z0-9_\-.~:@+]/g,"_"); }
+function partnerPeer(){ return S.peers.find(p => p.kind==="viewer" && !p.isMe && (p.by || p.presence?.uid) && (p.by || p.presence.uid)!==S.me) || null; }
+function partnerId(){
+  let best=null, t=-1;
+  for (const a of S.answers.values()) if (a.uid!==S.me && (a.at||0)>t){ best=a.uid; t=a.at||0; }
+  if (!best){ const p = partnerPeer(); if (p) best = p.by || p.presence.uid; }
+  return best;
+}
+function firstName(uid){
+  if (!uid) return "your partner";
+  const n = S.profiles[uid]?.name || "";
+  return n ? n.split(/\s+/)[0] : (uid===S.me ? "you" : "your partner");
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function maxN(){ let m=0; for (const r of S.rounds.values()) m=Math.max(m, r.n||0); return m; }
+function openedRounds(){ return [...S.rounds.entries()].filter(([rid])=>revealed(rid)).map(([rid,r])=>({rid,...r})).sort((a,b)=>(b.n||0)-(a.n||0)||(b.startedAt||0)-(a.startedAt||0)); }
+function stamp(at){
+  if (!at) return "";
+  return new Date(at).toLocaleDateString(undefined,{day:"2-digit",month:"short",year:"2-digit"}).toUpperCase();
+}
+let nameKey = "";
+function resolveNames(){
+  if (!S.user) return;
+  const ids = [...new Set([S.me, partnerId(), ...[...S.answers.values()].map(a=>a.uid)].filter(Boolean))];
+  const key = ids.sort().join(",");
+  if (key===nameKey) return;
+  nameKey = key;
+  S.user.profiles(ids).then(ps => { S.profiles = {...S.profiles, ...ps}; render(); });
+}
+
+/* ---------- actions ---------- */
+function errMsg(e){
+  const c = e && e.code;
+  if (c==="invalid_argument") return "That didn’t save. Replying needs Editor access to this page.";
+  if (c==="quota_exceeded") return "The mailbox is full. Remove some of your own questions and try again.";
+  if (c==="resource_exhausted") return "Slow down a little, then try again.";
+  return "Couldn’t reach the mailbox. Try again in a moment.";
+}
+let toastT;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 4200); }
+
+function draw(excludeQid){
+  const cats = deckCats();
+  const used = new Set([...S.rounds.values()].map(r=>r.qid));
+  let pool = allQuestions().filter(q => cats.includes(q.cat) && q.qid!==excludeQid);
+  if (!pool.length) pool = allQuestions().filter(q => q.qid!==excludeQid);
+  const fresh = pool.filter(q => !used.has(q.qid));
+  const ownFresh = fresh.filter(q => q.cat==="own");
+  const from = ownFresh.length && Math.random()<0.5 ? ownFresh : (fresh.length ? fresh : pool);
+  return from[Math.floor(Math.random()*from.length)];
+}
+async function newRound(skip){
+  if (S.busy || !S.db) return;
+  S.busy = true; render();
+  const cur = S.round;
+  try{
+    const q = draw(cur?.qid);
+    const n = skip && cur ? (cur.n||1) : maxN()+1;
+    const rid = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    const body = {rid, qid:q.qid, cat:q.cat, text:q.text, n, startedAt:Date.now(), by:S.me};
+    await S.db.doc("rounds/"+rid).set(body);
+    await S.db.doc("game/round").set(body);
+    if (skip && cur && !answersFor(cur.rid).length) await S.db.doc("rounds/"+cur.rid).delete();
+  }catch(e){ toast(errMsg(e)); }
+  S.busy = false; render();
+}
+async function sendReply(){
+  const r = S.round, text = $("reply").value.trim();
+  if (!r || !text || S.busy) return;
+  S.busy = true; render();
+  try{
+    const prev = mineFor(r.rid);
+    await S.db.doc("answers/"+answerDocId(r.rid,S.me)).set({rid:r.rid, uid:S.me, text, at:Date.now(), react: prev?.react ?? null});
+    store.set("sd-draft-"+r.rid, null);
+    S.editing = false; setWriting(false);
+  }catch(e){ toast(errMsg(e)); }
+  S.busy = false; render();
+}
+async function react(rid, k){
+  const mine = mineFor(rid); if (!mine) return;
+  try{ await S.db.doc("answers/"+answerDocId(rid,S.me)).update({react: mine.react===k ? null : k}); }
+  catch(e){ toast(errMsg(e)); }
+}
+async function toggleCat(key){
+  const cats = new Set(deckCats());
+  if (cats.has(key)){ if (cats.size===1){ toast("Keep at least one pile in the deck."); return; } cats.delete(key); }
+  else cats.add(key);
+  try{ await S.db.doc("game/deck").set({cats:[...cats]}); }catch(e){ toast(errMsg(e)); }
+}
+function setWriting(on){
+  if (!S.room || S.writing===on) return;
+  S.writing = on;
+  S.room.presence({writing:on}).catch(()=>{});
+}
+
+/* ---------- render ---------- */
+function render(){
+  resolveNames();
+  renderHeader();
+  for (const t of ["play","letters","deck"]){
+    $("tab-"+t).setAttribute("aria-selected", String(S.tab===t));
+    $("view-"+t).hidden = S.tab!==t;
+  }
+  const banner = $("banner");
+  const msg = {
+    noclaude:"Open this page on claude.ai to play. The mailbox lives there.",
+    signin:"Sign in to claude.ai, then reload this page to start swapping letters.",
+    nodb:"The mailbox couldn’t open in this view. Reload the page to try again."
+  }[S.status] || (S.ready && !S.canWrite ? "You can read along, but sending replies needs Editor access. Ask the person who shared this page to give you Editor access." : "");
+  banner.textContent = msg; banner.hidden = !msg;
+  if (S.tab==="play") renderPlay();
+  if (S.tab==="letters") renderArchive();
+  if (S.tab==="deck") renderDeck();
+}
+
+function renderHeader(){
+  const pid = partnerId(), peer = partnerPeer();
+  const pair = $("pair"); pair.replaceChildren();
+  const person = (uid, label, online) => {
+    const p = uid && S.profiles[uid];
+    const av = h("span",{class:"avatar"}, h("img",{src:p?.avatarUrl || "data:image/gif;base64,R0lGODlhAQABAAAAACw=", alt:""}), h("i",{class: online ? "on" : ""}));
+    if (!p) av.firstChild.style.background = "var(--tint)";
+    return h("div",{class:"person"}, av, h("span",{class:"who"}, h("b",{text:label}), h("small",{text: online ? "here now" : "away"})));
+  };
+  if (S.me) pair.append(person(S.me, cap(firstName(S.me)), true));
+  pair.append(h("span",{class:"amp","aria-hidden":"true",text:"&"}));
+  pair.append(person(pid, cap(firstName(pid)), !!peer));
+  const opened = openedRounds();
+  let learned=0, knew=0;
+  for (const a of S.answers.values()){ if (a.react==="new") learned++; if (a.react==="knew") knew++; }
+  $("stats").replaceChildren(
+    h("span",{}, h("b",{text:opened.length}), opened.length===1?" letter opened":" letters opened"),
+    h("span",{}, h("b",{text:learned}), learned===1?" new thing learned":" new things learned"),
+    h("span",{}, h("b",{text:knew}), " called it"));
+  $("tab-letters").textContent = "Our letters" + (opened.length ? " ("+opened.length+")" : "");
+}
+
+function renderPlay(){
+  const body = $("card-body"), foot = $("card-foot"), compose = $("compose");
+  const r = S.round;
+  if (!S.ready || !S.roundLoaded){
+    $("stamp").textContent = "Airmail"; $("postmark").hidden = true;
+    body.replaceChildren(h("p",{class:"q",text: S.status==="loading" ? "Opening the mailbox…" : "The mailbox is closed for now."}));
+    compose.hidden = true; foot.replaceChildren(); return;
+  }
+  if (!r){
+    $("stamp").textContent = "First letter"; $("postmark").hidden = true;
+    body.replaceChildren(
+      h("p",{class:"q",text:"Your first letter is waiting to be written."}),
+      h("ol",{class:"steps"},
+        h("li",{},"Draw a question. You both get the same one."),
+        h("li",{},"Each of you writes a reply and seals it. Nobody can peek."),
+        h("li",{},"When both replies are in, the letters open together. React, talk it over, then draw the next one.")));
+    compose.hidden = true;
+    foot.replaceChildren(h("div",{class:"row"}, h("button",{class:"btn",onclick:()=>newRound(false),disabled:S.busy||!S.canWrite},"Draw the first question")));
+    return;
+  }
+  const mine = mineFor(r.rid), theirs = theirsFor(r.rid), open = revealed(r.rid);
+  const pid = partnerId(), pname = firstName(pid), peer = partnerPeer();
+  $("stamp").textContent = catName(r.cat);
+  $("postmark").hidden = false;
+  $("postmark").replaceChildren(h("span",{text:"Letter"}), h("b",{text:"No. "+(r.n||1)}), h("span",{text:stamp(r.startedAt)}));
+  body.replaceChildren(
+    h("p",{class:"q",text:r.text}),
+    h("p",{class:"hint",text: open ? "Both letters are open. Read them out loud, then talk about it." : "Answer as if "+pname+" just asked you. “I” and “me” mean them."}));
+
+  // keep the textarea in step with the round
+  const ta = $("reply");
+  if (S.composeRid !== r.rid){ S.composeRid = r.rid; S.editing = false; ta.value = store.get("sd-draft-"+r.rid) || ""; }
+  const showCompose = !open && (!mine || S.editing) && S.canWrite;
+  compose.hidden = !showCompose;
+  $("send").disabled = S.busy;
+  $("send").textContent = mine ? "Re-seal & send" : "Seal & send";
+  $("cancel-edit").hidden = !(mine && S.editing);
+  $("compose-note").textContent = pname==="your partner" ? "Your partner can’t read it until they send theirs." : cap(pname)+" can’t read it until they send theirs.";
+
+  foot.replaceChildren();
+  if (open){
+    const letters = h("div",{class:"letters"});
+    const fresh = !S.seen.has(r.rid); S.seen.add(r.rid);
+    letters.append(letterEl(theirs, mine, true, fresh), letterEl(mine, theirs, false, fresh));
+    foot.append(letters,
+      h("div",{class:"next"},
+        h("button",{class:"btn",onclick:()=>newRound(false),disabled:S.busy||!S.canWrite},"Draw the next question"),
+        h("span",{class:"muted",text:"Opened letters are kept in Our letters."})));
+    return;
+  }
+  S.seen.add(r.rid);
+  const slots = h("div",{class:"slots"});
+  if (mine && !S.editing){
+    slots.append(h("div",{},
+      h("p",{class:"label",text:"Your reply · sealed"}),
+      h("div",{class:"letter mine-sealed"}, h("p",{class:"text",text:mine.text})),
+      h("div",{class:"row"}, h("button",{class:"link",onclick:()=>{ S.editing=true; $("reply").value=mine.text; render(); $("reply").focus(); },disabled:!S.canWrite},"Edit my reply"))));
+  }
+  const writing = peer && peer.presence?.writing;
+  const note = theirs
+    ? [cap(pname)+"’s reply is sealed and waiting. Send yours and both letters open."]
+    : [mine ? "Waiting for "+pname+"’s reply." : cap(pname)+" hasn’t replied yet.",
+       writing ? h("span",{class:"muted"}," "+cap(pname)+" is writing", h("span",{class:"writing","aria-hidden":"true"},h("span"),h("span"),h("span"))) : null];
+  slots.append(h("div",{},
+    h("p",{class:"label",text: cap(pname)+"’s reply"}),
+    h("div",{class:"env"+(theirs?"":" empty")}, h("span",{class:"seal",html:HEART})),
+    h("p",{class:"env-note"}, ...note)));
+  foot.append(slots);
+  if (!answersFor(r.rid).length && S.canWrite){
+    foot.append(h("div",{class:"next"}, h("button",{class:"link",onclick:()=>newRound(true),disabled:S.busy},"Draw a different question")));
+  }
+}
+
+function letterEl(a, other, isTheirs, fresh){
+  const el = h("div",{class:"letter"+(fresh?" opening":"")});
+  if (!a) return el;
+  el.append(h("p",{class:"from",text: isTheirs ? "From "+cap(firstName(a.uid)) : "From you"}), h("p",{class:"text",text:a.text}));
+  if (isTheirs){
+    // my reaction to their letter lives on my own answer
+    const myReact = other?.react;
+    el.append(h("div",{class:"reacts"}, REACTS.map(x => h("button",{class:"chip","aria-pressed":String(myReact===x.k),onclick:()=>react(a.rid,x.k),disabled:!S.canWrite},x.label))));
+  } else if (other?.react){
+    el.append(h("span",{class:"got",text: cap(firstName(other.uid))+": "+REACTS.find(x=>x.k===other.react)?.label}));
+  }
+  return el;
+}
+
+function renderArchive(){
+  const list = $("archive"); list.replaceChildren();
+  const opened = openedRounds();
+  if (!opened.length){
+    list.append(h("div",{class:"empty-state"}, h("p",{style:"margin:0",text:"No letters opened yet. Once you both reply to a question, the pair of letters is kept here."})));
+    return;
+  }
+  for (const r of opened){
+    const as = answersFor(r.rid).sort((a,b)=> (a.uid===S.me) - (b.uid===S.me));
+    const letters = h("div",{class:"letters"});
+    for (const a of as.slice(0,2)){
+      const other = as.find(x=>x.uid!==a.uid);
+      const card = h("div",{class:"letter"}, h("p",{class:"from",text: a.uid===S.me ? "From you" : "From "+cap(firstName(a.uid))}), h("p",{class:"text",text:a.text}));
+      if (other?.react) card.append(h("span",{class:"got",text:(other.uid===S.me?"You":cap(firstName(other.uid)))+": "+REACTS.find(x=>x.k===other.react)?.label}));
+      letters.append(card);
+    }
+    list.append(h("article",{class:"entry"},
+      h("p",{class:"entry-meta"}, h("span",{text:"No. "+(r.n||1)}), h("span",{text:stamp(r.startedAt)}), h("span",{text:catName(r.cat)})),
+      h("h3",{text:r.text}), letters));
+  }
+}
+
+function renderDeck(){
+  const cats = new Set(deckCats());
+  const used = new Set([...S.rounds.values()].map(r=>r.qid));
+  const all = allQuestions();
+  const box = $("cats"); box.replaceChildren();
+  for (const c of [...CATS, OWN]){
+    const qs = all.filter(q=>q.cat===c.key);
+    if (c.key==="own" && !qs.length) continue;
+    const left = qs.filter(q=>!used.has(q.qid)).length;
+    box.append(h("button",{class:"cat","aria-pressed":String(cats.has(c.key)),onclick:()=>toggleCat(c.key),disabled:!S.canWrite||!S.ready},
+      h("span",{class:"box",html:CHECK}),
+      h("span",{}, h("b",{text:c.name}), h("small",{text:qs.length+" questions · "+left+" not asked yet"}))));
+  }
+  const own = $("own-list"); own.replaceChildren();
+  const customs = [...S.custom.entries()].sort((a,b)=>(a[1].at||0)-(b[1].at||0));
+  if (!customs.length) own.append(h("li",{}, h("span",{class:"muted",text:"None yet. Add a question only the two of you would think to ask."})));
+  for (const [id,c] of customs){
+    own.append(h("li",{}, h("span",{text:c.text}),
+      h("button",{class:"link",onclick:async()=>{ try{ await S.db.doc("custom/"+id).delete(); }catch(e){ toast(errMsg(e)); } },disabled:!S.canWrite},"Remove")));
+  }
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => { S.tab = b.dataset.tab; try{ history.replaceState(null,"", S.tab==="play" ? location.pathname : "#"+S.tab); }catch{} render(); }));
+$("send").addEventListener("click", sendReply);
+$("cancel-edit").addEventListener("click", () => { S.editing=false; setWriting(false); render(); });
+let draftT;
+$("reply").addEventListener("input", e => {
+  const v = e.target.value;
+  setWriting(v.trim().length>0);
+  clearTimeout(draftT); draftT = setTimeout(()=>{ if (S.round) store.set("sd-draft-"+S.round.rid, v || null); }, 400);
+});
+$("reply").addEventListener("blur", () => setWriting(false));
+$("reply").addEventListener("keydown", e => { if ((e.metaKey||e.ctrlKey) && e.key==="Enter") sendReply(); });
+$("add-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = $("own-q"), text = input.value.trim();
+  if (!text || !S.db) return;
+  try{ await S.db.collection("custom").add({text, by:S.me, at:Date.now()}); input.value=""; toast("Added. It’ll come up soon."); }
+  catch(err){ toast(errMsg(err)); }
+});
+if (["letters","deck"].includes(location.hash.slice(1))) S.tab = location.hash.slice(1);
+
+async function boot(){
+  render();
+  if (!window.claude?.use){ S.status="noclaude"; render(); return; }
+  const [db, user, room] = await Promise.all([claude.use("db"), claude.use("user"), claude.use("room")]);
+  S.user = user;
+  if (user){
+    S.me = await user.id();
+    const c = await user.can("data.write");
+    S.canWrite = c !== false;
+  }
+  if (!db){ S.status = S.me ? "nodb" : "signin"; render(); return; }
+  if (!S.me){ S.status="signin"; render(); return; }
+  S.db = db; S.status = "ok"; S.ready = true;
+  const onErr = e => { if (e?.code==="revoked"){ S.canWrite=false; } else toast(errMsg(e)); render(); };
+  db.doc("game/round").onSnapshot(s => { S.round = s.exists ? s.data() : null; S.roundLoaded = true; render(); }, onErr);
+  db.doc("game/deck").onSnapshot(s => { S.deck = s.exists ? s.data() : null; render(); }, onErr);
+  db.collection("rounds").limit(1000).onSnapshot(q => { S.rounds = new Map(q.docs.map(d=>[d.id,d.data()])); render(); }, onErr);
+  db.collection("answers").limit(1000).onSnapshot(q => { S.answers = new Map(q.docs.map(d=>[d.id,d.data()])); render(); }, onErr);
+  db.collection("custom").limit(300).onSnapshot(q => { S.custom = new Map(q.docs.map(d=>[d.id,d.data()])); render(); }, onErr);
+  if (room){
+    S.room = room;
+    room.onPeers(ch => { S.peers = ch.peers; render(); });
+    room.presence({uid:S.me, writing:false}).catch(()=>{});
+  }
+}
+boot();
+</script>
